@@ -1,16 +1,18 @@
-<?php
-    session_start();
-    include "../../config/database.php";
-    if(isset($_SESSION["role"])){
-        if(isset($_SESSION["role"]) || $_SESSION["role"] != "admin") {
-            header("Location: ../../index.php");
-            exit;
-        }
-    
-    }
-     $sql = "SELECT * FROM users WHERE role = 'student' ORDER BY id DESC";
-    $result = mysqli_query($conn, $sql);
+<?php 
+session_start();
+include "../../config/database.php";
+// only admin can access
+if (!isset($_SESSION['role']) || $_SESSION["role"] != "admin") {
+    header("Location; ../index.php");
+    exit;
+}
+
+//get all student record
+$sql = "SELECT * FROM users WHERE role='student' ORDER BY id DESC";
+
+$result = mysqli_query($conn, $sql);
 ?>
+
 <!doctype html>
 <html lang="en">
 
@@ -45,7 +47,7 @@
 
             <a
                 class="navbar-brand"
-                href="dashboard.html"
+                href="../dashboard.php"
             >
                 Student Portal Admin
             </a>
@@ -55,18 +57,16 @@
 
     <!-- Main Content -->
     <div class="container py-4">
-        <?php 
-                if(isset($_GET["message"])){ ?>
-                <div class="alert alert-success"> <?php echo $_GET["message"];?> /div>
-                <?php }?>
+        <?php if(isset($_GET["message"])) { ?>
 
+        <div class="aler alert-success"><?php echo $_GET["message"] ?></div> 
+
+        <?php } ?>
         <!-- Header Section -->
         <div class="d-flex justify-content-between mb-3">
 
             <div>
-                
                 <h2>Student Accounts</h2>
-                
 
                 <a href="../dashboard.php">
                     ← Dashboard
@@ -100,44 +100,43 @@
                     <tbody>
 
                         <!-- Student Record -->
-                        <?php 
-                        while( $row = mysqli_fetch_assoc($result)) {?>
-
+                         <?php while($row = mysqli_fetch_assoc($result)) { ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($row["student_no"]); ?></td>
+                            <td><?php echo htmlspecialchars($row['student_no']); ?></td>
 
                             <td>
-                                <?php echo htmlspecialchars($row["full_name"]); ?>
+                                <?php echo htmlspecialchars($row['full_name']); ?>
                             </td>
 
                             <td>
-                                <?php echo htmlspecialchars($row["username"]); ?>
+                                <?php echo htmlspecialchars($row['username']); ?>
                             </td>
 
                             <td>
                                 <a
                                     class="btn btn-success btn-sm"
-                                    href="enroll.html"
+                                    href="create.php"
                                 >
                                     Enroll Subjects
                                 </a>
 
                                 <a
                                     class="btn btn-warning btn-sm"
-                                    href="student_form.html"
+                                    href="create.php"
                                 >
                                     Edit
                                 </a>
 
-                                <button
+                                <a
                                     class="btn btn-danger btn-sm"
+                                    href="delete.php?id=<?php echo $row['id'];?>"
+                                    onclick="return confirm('Are you sure you want to delete this record?')"
                                 >
                                     Delete
-                                </button>
+                                </a>
                             </td>
                         </tr>
                         <?php } ?>
-
                     </tbody>
 
                 </table>

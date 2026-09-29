@@ -1,3 +1,15 @@
+<?php
+    session_start();
+    include "../../config/database.php";
+    if(!isset($_SESSION["role"]) || $_SESSION["role"] != "admin"){
+        header("Location:../../index.php");
+        exit;
+    }    
+    $sql = "SELECT * FROM subjects ORDER BY id ASC";
+    $result = mysqli_query($conn, $sql);
+    
+
+?>
 <!doctype html>
 <html lang="en">
 
@@ -32,7 +44,7 @@
 
             <a
                 class="navbar-brand"
-                href="dashboard.html"
+                href="../dashboard.php"
             >
                 Student Portal Admin
             </a>
@@ -49,13 +61,13 @@
             <div>
                 <h2>Subjects</h2>
 
-                <a href="dashboard.html">
+                <a href="../dashboard.php">
                     ← Dashboard
                 </a>
             </div>
 
             <a
-                href="subject_form.html"
+                href="create.php"
                 class="btn btn-primary"
             >
                 + Add Subject
@@ -82,30 +94,44 @@
                     <tbody>
 
                         <!-- Subject Record -->
+                         <?php while ($row = mysqli_fetch_assoc($result)){?>
                         <tr>
-                            <td>IT101</td>
+                            <td><?php echo htmlspecialchars($row['subject_code']); ?></td>
 
                             <td>
-                                Introduction to Computing
+                                <?php echo htmlspecialchars($row['subject_name']); ?>
                             </td>
 
-                            <td>3</td>
+                            <td><?php echo htmlspecialchars($row['units']); ?></td>
 
                             <td>
                                 <a
-                                    href="subject_form.html"
-                                    class="btn btn-warning btn-sm"
+                                  href="edit.php?id=<?php echo $row['id']; ?>"
+                                 class="btn btn-warning btn-sm"
                                 >
-                                    Edit
+                                Edit
                                 </a>
 
-                                <button
-                                    class="btn btn-danger btn-sm"
+                                <form
+                                action="delete.php"
+                                method="POST"
+                                style="display:inline;"
+                                onsubmit="return confirm('Are you sure you want to delete this subject?');"
                                 >
+                                    <input
+                                    type="hidden"
+                                    name="id"
+                                    value="<?php echo $row['id']; ?>"
+                                    >
+
+                                    <button
+                                    type="submit"
+                                    class="btn btn-danger btn-sm"
+                                    >
                                     Delete
-                                </button>
                             </td>
                         </tr>
+                        <?php } ?>
 
                     </tbody>
 

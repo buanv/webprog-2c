@@ -1,34 +1,36 @@
-<?php
- session_start();
-    include "../../config/database.php";
-    //if user is already logged in send the page to dashboard
-    if(!isset($_SESSION["role"])){
-        if(isset($_SESSION["role"]) || $_SESSION["role"] != "admin") {
-            header("Location: ../../index.php");
-            exit;
-        }
-    }
-    $message ="";
-    if(isset($_POST["save"])){
-        $student_no = $_POST["student_no"];
-        $full_name = $_POST["full_name"];
-        $username = $_POST["username"];
-        $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
-        $sql = "INSERT INTO users (`student_no`, `full_name`, `username`, `password`, `role`) 
-        VALUES ('$student_no', '$full_name', '$username', '$password', 'student')";
+<?php 
+session_start();
+include "../../config/database.php";
+// only admin can access
+if (!isset($_SESSION['role']) || $_SESSION["role"] != "admin") {
+    header("Location; ../index.php");
+    exit;
+}
 
-        if(mysqli_query($conn, $sql)){
-            header("Location: index.php?message=Student Record Added Successfully!");
-            exit;
-        
-        }
-        else{
-            $message = "Couldn't Save Student Record.";
-        }
+$message = "";
+
+if(isset($_POST["submit"])){
+    $student_no  = $_POST["student_no"];
+    $full_name  = $_POST["full_name"];
+    $username  = $_POST["username"];
+    $password  = password_hash($_POST["password"], PASSWORD_DEFAULT);
+
+    $sql = "INSERT INTO users (student_no, full_name, username, password, role) 
+    VALUES ('$student_no', '$full_name', '$username', '$password', 'student')";
+
+    if(mysqli_query($conn, $sql)){
+        header("Location: index.php?message=Student Record Added Successfully!");
+        exit;
     }
+    else{
+        $message = "Could not save the record please try again.";
+    }
+    
+}
 ?>
-<!doctype html>
 
+
+<!doctype html>
 <html lang="en">
 
 <head>
@@ -62,10 +64,12 @@
             <div class="card-body p-4">
 
                 <h2>Student Account Form</h2>
-                <?php if($message !=""){ ?>
-                <div class="alert alert-danger"> <?php echo $message; ?> </div>
+                <?php if($message != "") {?>
+
+                <div class="alert alert-danger"> <?php echo $message ?></div>
+
                 <?php } ?>
-                <form method="POST"> 
+                <form method="POST">
 
                     <!-- Student Number -->
                     <div class="mb-3">
@@ -110,8 +114,8 @@
                     <!-- Form Actions -->
                     <button
                         type="submit"
+                        name="submit"
                         class="btn btn-primary"
-                        name="save"
                     >
                         Save Student
                     </button>

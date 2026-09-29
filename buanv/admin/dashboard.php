@@ -1,3 +1,20 @@
+<?php
+session_start();
+include "../config/database.php";
+
+// only admin can access
+if (!isset($_SESSION['role']) || $_SESSION["role"] != "admin") {
+    header("Location; ../index.php");
+    exit;
+}
+
+$students = mysqli_query($conn, "SELECT id FROM users WHERE role='student'");
+$subjects = mysqli_query($conn, "SELECT id FROM subjects");
+$enrollments = mysqli_query($conn, "SELECT id FROM enrollments");
+
+?>
+
+
 <!doctype html>
 <html lang="en">
 
@@ -6,22 +23,19 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1"
-    >
+        content="width=device-width, initial-scale=1">
 
     <title>Admin Dashboard</title>
 
     <!-- Bootstrap CSS -->
     <link
         href="../assets/vendor/bootstrap/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+        rel="stylesheet">
 
     <!-- Custom CSS -->
     <link
         href="../assets/css/style.css"
-        rel="stylesheet"
-    >
+        rel="stylesheet">
 </head>
 
 <body>
@@ -36,8 +50,7 @@
 
             <a
                 class="btn btn-outline-light btn-sm"
-                href="..\logout.php"
-            >
+                href="../logout.php">
                 Logout
             </a>
 
@@ -50,7 +63,7 @@
         <h2>Admin Dashboard</h2>
 
         <p class="text-muted">
-            Welcome, System Administrator.
+            Welcome, <?php echo htmlspecialchars($_SESSION['full_name']); ?>.
         </p>
 
         <div class="row g-3">
@@ -62,12 +75,11 @@
 
                         <h6>Student Accounts</h6>
 
-                        <h2>10</h2>
+                        <h2><?php echo mysqli_num_rows($students); ?></h2>
 
                         <a
-                            href="../..index.php"
-                            class="btn btn-primary btn-sm"
-                        >
+                            href="students/index.php"
+                            class="btn btn-primary btn-sm">
                             Manage Students
                         </a>
 
@@ -82,12 +94,11 @@
 
                         <h6>Subjects</h6>
 
-                        <h2>8</h2>
+                        <h2><?php echo mysqli_num_rows($subjects); ?></h2>
 
                         <a
-                            href="subjects.html"
-                            class="btn btn-primary btn-sm"
-                        >
+                            href="subjects/index.php"
+                            class="btn btn-primary btn-sm">
                             Manage Subjects
                         </a>
 
@@ -102,7 +113,7 @@
 
                         <h6>Enrollments</h6>
 
-                        <h2>24</h2>
+                        <h2><?php echo mysqli_num_rows($enrollments); ?></h2>
 
                         <span class="text-muted small">
                             Managed from Student Records
